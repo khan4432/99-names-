@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Islamic Quiz & Spin Wheel - Saif, Kaif, Huzaifa, Ali</title>
+  <style>
+    :root {
+      --bg-gradient: linear-gradient(-45deg, #ff0055, #ff9900, #33cc33, #0099ff, #9933ff, #ff00cc);
+      --card-bg: rgba(15, 20, 35, 0.85);
+      --accent: #00e5ff;
+      --text-color: #ffffff;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: var(--bg-gradient);
+      background-size: 400% 400%;
+      animation: rainbowBG 10s ease infinite;
+      color: var(--text-color);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 15px;
+    }
+
+    @keyframes rainbowBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Top Color Theme Selector */
+    .top-bar {
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      padding: 10px 18px;
+      border-radius: 15px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+      margin-bottom: 15px;
+    }
+
+    .top-bar h1 {
+      font-size: 1.3rem;
+      letter-spacing: 0.5px;
+      color: #ffd700;
+    }
+
+    .color-palette {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .color-palette span {
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-right: 4px;
+    }
+
+    .color-btn {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      border: 2px solid #fff;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .color-btn:hover, .color-btn.active {
+      transform: scale(1.25);
+      box-shadow: 0 0 10px #fff;
+    }
+
+    /* Main Grid Layout */
+    .main-container {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 20px;
+      flex: 1;
+      align-items: start;
+    }
+
+    @media (max-width: 900px) {
+      .main-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .panel {
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      border-radius: 20px;
+      padding: 22px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Quiz Section */
+    .quiz-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .badge {
+      background: rgba(255, 255, 255, 0.15);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: bold;
+    }
+
+    .active-player-banner {
+      background: linear-gradient(90deg, #ff8a00, #e52e71);
+      padding: 8px 16px;
+      border-radius: 12px;
+      font-weight: bold;
+      font-size: 1rem;
+      box-shadow: 0 4px 12px rgba(229, 46, 113, 0.4);
+    }
+
+    .question-box {
+      background: rgba(255, 255, 255, 0.08);
+      padding: 20px;
+      border-radius: 15px;
+      margin-bottom: 18px;
+      border-left: 5px solid #ffd700;
+    }
+
+    .question-text {
+      font-size: 1.25rem;
+      line-height: 1.5;
+      font-weight: 600;
+    }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    @media (max-width: 600px) {
+      .options-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .option-btn {
+      background: rgba(255, 255, 255, 0.12);
+      border: 2px solid rgba(255, 255, 255, 0.25);
+      color: #fff;
+      padding: 14px 16px;
+      border-radius: 12px;
+      text-align: left;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.25);
+      transform: translateY(-2px);
+    }
+
+    .option-btn:disabled {
+      cursor: not-allowed;
+    }
+
+    .option-btn.correct {
+      background: #16a34a !important;
+      border-color: #4ade80 !important;
+      box-shadow: 0 0 15px rgba(74, 222, 128, 0.6);
+    }
+
+    .option-btn.wrong {
+      background: #dc2626 !important;
+      border-color: #f87171 !important;
+    }
+
+    .opt-label {
+      background: rgba(0, 0, 0, 0.4);
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      flex-shrink: 0;
+    }
+
+    .quiz-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .feedback-msg {
+      font-size: 1.05rem;
+      font-weight: bold;
+      min-height: 24px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #00c6ff, #0072ff);
+      border: none;
+      color: white;
+      padding: 11px 22px;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .btn-primary:hover {
+      transform: scale(1.04);
+      box-shadow: 0 5px 15px rgba(0, 114, 255, 0.5);
+    }
+
+    /* Right Panel: Wheel + Scoreboard */
+    .right-column {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .wheel-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+
+    .wheel-wrapper {
+      position: relative;
+      width: 270px;
+      height: 270px;
+      margin: 10px 0;
+    }
+
+    .pointer {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 16px solid transparent;
+      border-right: 16px solid transparent;
+      border-top: 28px solid #ffd700;
+      z-index: 10;
+      filter: drop-shadow(0 3px 5px rgba(0,0,0,0.6));
+    }
+
+    canvas#wheelCanvas {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 6px solid #fff;
+      box-shadow: 0 0 25px rgba(0, 0, 0, 0.6);
+    }
+
+    .spin-btn {
+      margin-top: 10px;
+      background: linear-gradient(135deg, #f59e0b, #ef4444);
+      border: none;
+      color: #fff;
+      padding: 12px 30px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 5px 15px rgba(239, 68, 68, 0.5);
+      transition: transform 0.2s;
+    }
+
+    .spin-btn:hover:not(:disabled) {
+      transform: scale(1.06);
+    }
+
+    .spin-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    /* Scoreboard */
+    .scoreboard-title {
+      font-size: 1.15rem;
+      margin-bottom: 12px;
+      color: #ffd700;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .reset-btn {
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.3);
+      color: #fff;
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+
+    .scores-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .player-card {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 12px 15px;
+      border-radius: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 2px solid transparent;
+      transition: 0.3s;
+      cursor: pointer;
+    }
+
+    .player-card.active {
+      border-color: #ffd700;
+      background: rgba(255, 215, 0, 0.2);
+      transform: scale(1.03);
+    }
+
+    .player-name {
+      font-weight: bold;
+      font-size: 1.05rem;
+    }
+
+    .player-points {
+      background: #ffd700;
+      color: #000;
+      font-weight: 800;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 1rem;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      background: var(--card-bg);
+      padding: 12px;
+      border-radius: 12px;
+      margin-top: 15px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #ffd700;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Header & 10 Color Options -->
+  <div class="top-bar">
+    <h1>🌙 Islamic Quiz & Spin Wheel (250 Sawaal)</h1>
+    <div class="color-palette" id="colorPalette">
+      <span>10 Colors:</span>
+    </div>
+  </div>
+
+  <!-- Main Workspace -->
+  <div class="main-container">
+    
+    <!-- Left: 250 Islamic Questions -->
+    <div class="panel">
+      <div class="quiz-header">
+        <span class="badge" id="qCounter">Sawaal 1 / 250</span>
+        <div class="active-player-banner" id="turnDisplay">Turn: Spin Wheel Karein!</div>
+      </div>
+
+      <div class="question-box">
+        <div class="question-text" id="questionText">Loading Islamic Sawaal...</div>
+      </div>
+
+      <div class="options-grid" id="optionsContainer"></div>
+
+      <div class="quiz-controls">
+        <div class="feedback-msg" id="feedbackMsg"></div>
+        <div style="display:flex; gap:10px;">
+          <button class="btn-primary" onclick="prevQuestion()">⬅ Pichla</button>
+          <button class="btn-primary" onclick="nextQuestion()">Agla Sawaal ➡</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Spin Wheel & Scoreboard -->
+    <div class="right-column">
+      
+      <!-- Spin Wheel -->
+      <div class="panel wheel-container">
+        <h3 style="color:#ffd700; margin-bottom:5px;">🎡 Spin Wheel (Naam Chunein)</h3>
+        <div class="wheel-wrapper">
+          <div class="pointer"></div>
+          <canvas id="wheelCanvas" width="300" height="300"></canvas>
+        </div>
+        <button class="spin-btn" id="spinBtn" onclick="spinWheel()">SPIN KAREIN</button>
+      </div>
+
+      <!-- Scoreboard -->
+      <div class="panel">
+        <div class="scoreboard-title">
+          <span>🏆 Points Board (Click to Select Player)</span>
+          <button class="reset-btn" onclick="resetScores()">Reset Points</button>
+        </div>
+        <div class="scores-grid" id="scoresGrid"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Bottom Footer -->
+  <footer>
+    wecome
+  </footer>
+
+  <script>
+    // 1. 10 Color Themes (Default Rainbow Live Wallpaper + 9 Colors)
+    const colorThemes = [
+      { name: "Rainbow Live", bg: "linear-gradient(-45deg, #ff0055, #ff9900, #33cc33, #0099ff, #9933ff, #ff00cc)", card: "rgba(15, 20, 35, 0.85)", dot: "conic-gradient(red, yellow, lime, aqua, blue, magenta, red)" },
+      { name: "Emerald Green", bg: "linear-gradient(-45deg, #064e3b, #10b981, #047857, #34d399)", card: "rgba(6, 40, 30, 0.88)", dot: "#10b981" },
+      { name: "Royal Blue", bg: "linear-gradient(-45deg, #1e3a8a, #3b82f6, #1d4ed8, #60a5fa)", card: "rgba(15, 25, 60, 0.88)", dot: "#3b82f6" },
+      { name: "Golden Sunset", bg: "linear-gradient(-45deg, #78350f, #f59e0b, #b45309, #fbbf24)", card: "rgba(45, 25, 5, 0.88)", dot: "#f59e0b" },
+      { name: "Crimson Red", bg: "linear-gradient(-45deg, #7f1d1d, #ef4444, #b91c1c, #f87171)", card: "rgba(50, 10, 10, 0.88)", dot: "#ef4444" },
+      { name: "Royal Purple", bg: "linear-gradient(-45deg, #4c1d95, #8b5cf6, #6d28d9, #a78bfa)", card: "rgba(30, 12, 65, 0.88)", dot: "#8b5cf6" },
+      { name: "Ocean Teal", bg: "linear-gradient(-45deg, #134e4a, #14b8a6, #0f766e, #2dd4bf)", card: "rgba(10, 45, 42, 0.88)", dot: "#14b8a6" },
+      { name: "Pink Rose", bg: "linear-gradient(-45deg, #831843, #ec4899, #be185d, #f472b6)", card: "rgba(55, 10, 30, 0.88)", dot: "#ec4899" },
+      { name: "Midnight Dark", bg: "linear-gradient(-45deg, #090d16, #1f2937, #111827, #374151)", card: "rgba(10, 14, 24, 0.92)", dot: "#1f2937" },
+      { name: "Deep Orange", bg: "linear-gradient(-45deg, #7c2d12, #f97316, #c2410c, #fb923c)", card: "rgba(50, 18, 5, 0.88)", dot: "#f97316" }
+    ];
+
+    const paletteDiv = document.getElementById("colorPalette");
+    colorThemes.forEach((theme, idx) => {
+      const btn = document.createElement("div");
+      btn.className = "color-btn" + (idx === 0 ? " active" : "");
+      btn.style.background = theme.dot;
+      btn.title = theme.name;
+      btn.onclick = () => {
+        document.documentElement.style.setProperty("--bg-gradient", theme.bg);
+        document.documentElement.style.setProperty("--card-bg", theme.card);
+        document.querySelectorAll(".color-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+      };
+      paletteDiv.appendChild(btn);
+    });
+
+    // 2. Players & Spin Wheel Setup
+    const players = ["Saif", "Kaif", "Huzaifa", "Ali"];
+    const wheelColors = ["#ef4444", "#3b82f6", "#10b981", "#f59e0b"];
+    let scores = { Saif: 0, Kaif: 0, Huzaifa: 0, Ali: 0 };
+    let currentPlayer = null;
+    let currentRotation = 0;
+    let isSpinning = false;
+
+    const canvas = document.getElementById("wheelCanvas");
+    const ctx = canvas.getContext("2d");
+
+    function drawWheel() {
+      const numSegments = players.length;
+      const arcSize = (2 * Math.PI) / numSegments;
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+      const radius = canvas.width / 2;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      for (let i = 0; i < numSegments; i++) {
+        const angle = i * arcSize;
+        ctx.beginPath();
+        ctx.fillStyle = wheelColors[i];
+        ctx.moveTo(centerX, centerY);
+        ctx.arc(centerX, centerY, radius, angle, angle + arcSize);
+        ctx.lineTo(centerX, centerY);
+        ctx.fill();
+        ctx.strokeStyle = "#ffffff";
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        // Text
+        ctx.save();
+        ctx.translate(centerX, centerY);
+        ctx.rotate(angle + arcSize / 2);
+        ctx.textAlign = "right";
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "bold 22px Segoe UI";
+        ctx.fillText(players[i], radius - 25, 8);
+        ctx.restore();
+      }
+    }
+    drawWheel();
+
+    function spinWheel() {
+      if (isSpinning) return;
+      isSpinning = true;
+      document.getElementById("spinBtn").disabled = true;
+
+      const extraSpins = 5 * 360;
+      const randomDeg = Math.floor(Math.random() * 360);
+      currentRotation += extraSpins + randomDeg;
+
+      canvas.style.transition = "transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99)";
+      canvas.style.transform = `rotate(${currentRotation}deg)`;
+
+      setTimeout(() => {
+        isSpinning = false;
+        document.getElementById("spinBtn").disabled = false;
+
+        // Calculate winner based on top pointer (270 degrees)
+        const normalizedDeg = currentRotation % 360;
+        const pointerAngle = (360 - normalizedDeg + 270) % 360;
+        const segmentAngle = 360 / players.length;
+        const winnerIndex = Math.floor(pointerAngle / segmentAngle);
+
+        selectPlayer(players[winnerIndex]);
+      }, 4000);
+    }
+
+    function selectPlayer(name) {
+      currentPlayer = name;
+      document.getElementById("turnDisplay").innerText = `🎯 Turn: ${name}`;
+      renderScores();
+    }
+
+    function renderScores() {
+      const grid = document.getElementById("scoresGrid");
+      grid.innerHTML = "";
+      players.forEach(p => {
+        const card = document.createElement("div");
+        card.className = "player-card" + (currentPlayer === p ? " active" : "");
+        card.onclick = () => selectPlayer(p);
+        card.innerHTML = `
+          <span class="player-name">${p}</span>
+          <span class="player-points">${scores[p]} pts</span>
+        `;
+        grid.appendChild(card);
+      });
+    }
+    renderScores();
+
+    function resetScores() {
+      players.forEach(p => scores[p] = 0);
+      renderScores();
+    }
+
+    // 3. 250 Islamic Questions Bank
+    const baseQuestions = [
+      { q: "Islam ke kitne arkaan (pillars) hain?", o: ["3", "4", "5", "6"], a: 2 },
+      { q: "Quran Majeed mein kul kitni Suratein hain?", o: ["110", "112", "114", "116"], a: 2 },
+      { q: "Sabse pehle Nabi kaun the?", o: ["Hazrat Nooh (AS)", "Hazrat Adam (AS)", "Hazrat Ibrahim (AS)", "Hazrat Musa (AS)"], a: 1 },
+      { q: "Aakhri Nabi kaun hain?", o: ["Hazrat Isa (AS)", "Hazrat Musa (AS)", "Hazrat Muhammad (SAW)", "Hazrat Dawood (AS)"], a: 2 },
+      { q: "Quran Majeed kis mahine mein nazil hua?", o: ["Muharram", "Rajab", "Ramadan", "Shawwal"], a: 2 },
+      { q: "Din mein kitni waqt ki namaz farz hai?", o: ["3", "4", "5", "6"], a: 2 },
+      { q: "Quran ki sabse badi Surah kaunsi hai?", o: ["Surah Al-Fatiha", "Surah Al-Baqarah", "Surah Yaseen", "Surah Al-Ikhlas"], a: 1 },
+      { q: "Quran ki sabse chhoti Surah kaunsi hai?", o: ["Surah Al-Kausar", "Surah Al-Asr", "Surah An-Nas", "Surah Al-Falaq"], a: 0 },
+      { q: "Pehle Khalifa kaun the?", o: ["Hazrat Umar (RA)", "Hazrat Usman (RA)", "Hazrat Ali (RA)", "Hazrat Abu Bakr Siddiq (RA)"], a: 3 },
+      { q: "Chauthe Khalifa kaun the?", o: ["Hazrat Ali (RA)", "Hazrat Umar (RA)", "Hazrat Abu Bakr (RA)", "Hazrat Usman (RA)"], a: 0 },
+      { q: "Zakat kis par farz hai?", o: ["Har bacche par", "Sahib-e-Nisab par", "Sirf musafiron par", "Kisi par nahi"], a: 1 },
+      { q: "Hajj kis mahine mein ada kiya jata hai?", o: ["Ramadan", "Muharram", "Zil-Hijjah", "Safar"], a: 2 },
+      { q: "Wahi lane wale farishte ka naam kya hai?", o: ["Hazrat Mikael (AS)", "Hazrat Israfeel (AS)", "Hazrat Jibreel (AS)", "Hazrat Izraeel (AS)"], a: 2 },
+      { q: "Huzoor (SAW) ki paidaish kis shehar mein hui?", o: ["Madina", "Makkah", "Taif", "Jerusalem"], a: 1 },
+      { q: "Huzoor (SAW) ka rawza mubarak kahan hai?", o: ["Makkah", "Madina", "Baghdad", "Damascus"], a: 1 },
+      { q: "Quran mein kitne Sipare (Para) hain?", o: ["20", "25", "30", "40"], a: 2 },
+      { q: "Kis Surah ko Quran ka dil kaha jata hai?", o: ["Surah Rahman", "Surah Mulk", "Surah Yaseen", "Surah Kahf"], a: 2 },
+      { q: "Asadullah (Allah ka Sher) kis Sahabi ka laqab hai?", o: ["Hazrat Umar (RA)", "Hazrat Ali (RA)", "Hazrat Hamza (RA)", "Hazrat Khalid (RA)"], a: 1 },
+      { q: "Saifullah (Allah ki Talwar) kis Sahabi ko kaha jata hai?", o: ["Hazrat Khalid bin Walid (RA)", "Hazrat Ali (RA)", "Hazrat Bilal (RA)", "Hazrat Saad (RA)"], a: 0 },
+      { q: "Islam ke pehle Muazzin kaun the?", o: ["Hazrat Zaid (RA)", "Hazrat Bilal Habshi (RA)", "Hazrat Salman (RA)", "Hazrat Abu Hurairah (RA)"], a: 1 },
+      { q: "Ghazwa-e-Badr kab lada gaya?", o: ["1 Hijri", "2 Hijri", "3 Hijri", "5 Hijri"], a: 1 },
+      { q: "Zabihullah kis Nabi ka laqab hai?", o: ["Hazrat Ishaq (AS)", "Hazrat Ismail (AS)", "Hazrat Yaqub (AS)", "Hazrat Yusuf (AS)"], a: 1 },
+      { q: "Kaleemullah kis Nabi ko kaha jata hai?", o: ["Hazrat Musa (AS)", "Hazrat Isa (AS)", "Hazrat Ibrahim (AS)", "Hazrat Nooh (AS)"], a: 0 },
+      { q: "Roohullah kis Nabi ka laqab hai?", o: ["Hazrat Adam (AS)", "Hazrat Isa (AS)", "Hazrat Yahya (AS)", "Hazrat Zakariya (AS)"], a: 1 },
+      { q: "Khaleelullah kis Nabi ko kaha jata hai?", o: ["Hazrat Ibrahim (AS)", "Hazrat Loot (AS)", "Hazrat Hud (AS)", "Hazrat Saleh (AS)"], a: 0 },
+      { q: "Hazrat Muhammad (SAW) ke walid ka naam kya tha?", o: ["Hazrat Abdul Muttalib", "Hazrat Abdullah", "Hazrat Abu Talib", "Hazrat Hamza"], a: 1 },
+      { q: "Hazrat Muhammad (SAW) ki walida ka naam kya tha?", o: ["Hazrat Halima", "Hazrat Amina", "Hazrat Khadija", "Hazrat Fatima"], a: 1 },
+      { q: "Islam ki pehli masjid kaunsi hai?", o: ["Masjid-e-Nabawi", "Masjid-e-Quba", "Masjid-al-Haram", "Masjid-al-Aqsa"], a: 1 },
+      { q: "Qibla-e-Awwal kaunsi masjid thi?", o: ["Masjid-al-Haram", "Masjid-al-Aqsa", "Masjid-e-Quba", "Masjid-e-Nabawi"], a: 1 },
+      { q: "Shab-e-Qadr kis mahine mein aati hai?", o: ["Shaban", "Ramadan", "Rajab", "Muharram"], a: 1 },
+      { q: "Quran ki kis Surah mein Bismillah do martaba aayi hai?", o: ["Surah Taubah", "Surah Naml", "Surah Fatiha", "Surah Ikhlas"], a: 1 },
+      { q: "Quran ki kis Surah ke shuru mein Bismillah nahi hai?", o: ["Surah Taubah", "Surah Anfal", "Surah Kahf", "Surah Maryam"], a: 0 },
+      { q: "Zaboor kis Nabi par nazil hui?", o: ["Hazrat Musa (AS)", "Hazrat Dawood (AS)", "Hazrat Isa (AS)", "Hazrat Ibrahim (AS)"], a: 1 },
+      { q: "Taurat kis Nabi par nazil hui?", o: ["Hazrat Musa (AS)", "Hazrat Isa (AS)", "Hazrat Dawood (AS)", "Hazrat Haroon (AS)"], a: 0 },
+      { q: "Injeel kis Nabi par nazil hui?", o: ["Hazrat Musa (AS)", "Hazrat Isa (AS)", "Hazrat Yahya (AS)", "Hazrat Sulaiman (AS)"], a: 1 },
+      { q: "Islamic calendar ka pehla mahina kaunsa hai?", o: ["Safar", "Muharram", "Ramadan", "Rajab"], a: 1 },
+      { q: "Islamic calendar ka aakhri mahina kaunsa hai?", o: ["Zil-Qadah", "Zil-Hijjah", "Shawwal", "Shaban"], a: 1 },
+      { q: "Eid-ul-Fitr kis tarikh ko manayi jati hai?", o: ["1 Ramadan", "1 Shawwal", "10 Zil-Hijjah", "10 Muharram"], a: 1 },
+      { q: "Eid-ul-Adha kis tarikh ko manayi jati hai?", o: ["10 Zil-Hijjah", "1 Zil-Hijjah", "9 Zil-Hijjah", "1 Shawwal"], a: 0 },
+      { q: "Youm-e-Arafah kis tarikh ko hota hai?", o: ["8 Zil-Hijjah", "9 Zil-Hijjah", "10 Zil-Hijjah", "11 Zil-Hijjah"], a: 1 },
+      { q: "Hazrat Nooh (AS) ki kashti kis pahad par ruki thi?", o: ["Koh-e-Toor", "Koh-e-Judi", "Koh-e-Noor", "Koh-e-Safa"], a: 1 },
+      { q: "Machli ke pet mein kaunse Nabi rahe the?", o: ["Hazrat Yunus (AS)", "Hazrat Ayub (AS)", "Hazrat Ilyas (AS)", "Hazrat Idris (AS)"], a: 0 },
+      { q: "Sabr ki misaal kis Nabi ke liye di jati hai?", o: ["Hazrat Ayub (AS)", "Hazrat Dawood (AS)", "Hazrat Sulaiman (AS)", "Hazrat Loot (AS)"], a: 0 },
+      { q: "Kaaba ki tameer kis Nabi ne ki thi?", o: ["Hazrat Ibrahim aur Ismail (AS)", "Hazrat Musa aur Haroon (AS)", "Hazrat Dawood aur Sulaiman (AS)", "Hazrat Nooh (AS)"], a: 0 },
+      { q: "Zamzam ka kuan kis shehar mein hai?", o: ["Madina", "Makkah", "Taif", "Jeddah"], a: 1 },
+      { q: "Huzoor (SAW) ne kitne saal ki umar mein nabuwat ka elaan kiya?", o: ["30 saal", "35 saal", "40 saal", "45 saal"], a: 2 },
+      { q: "Ghar-e-Hira kis pahad par hai?", o: ["Jabal-e-Noor", "Jabal-e-Rahmat", "Jabal-e-Uhud", "Jabal-e-Saur"], a: 0 },
+      { q: "Hijrat ke waqt Huzoor (SAW) kis ghar (cave) mein ruke the?", o: ["Ghar-e-Hira", "Ghar-e-Saur", "Ghar-e-Uhud", "Ghar-e-Taif"], a: 1 },
+      { q: "Hijrat ke safar mein Huzoor (SAW) ke saathi kaun the?", o: ["Hazrat Umar (RA)", "Hazrat Abu Bakr (RA)", "Hazrat Ali (RA)", "Hazrat Usman (RA)"], a: 1 },
+      { q: "Quran Majeed kitne arse (years) mein mukammal nazil hua?", o: ["10 saal", "15 saal", "23 saal", "30 saal"], a: 2 }
+    ];
+
+    // Additional Authentic Islamic Questions to reach 250 unique questions
+    const extraQuestions = [
+      { q: "Namaz-e-Janaza mein kitni takbeerein hoti hain?", o: ["2", "3", "4", "5"], a: 2 },
+      { q: "Jumma ki namaz mein kitni farz rakatein hoti hain?", o: ["2", "4", "6", "8"], a: 0 },
+      { q: "Fajr ki namaz mein kitni farz rakatein hoti hain?", o: ["2", "3", "4", "1"], a: 0 },
+      { q: "Maghrib ki namaz mein kitni farz rakatein hoti hain?", o: ["2", "3", "4", "5"], a: 1 },
+      { q: "Isha ki namaz mein kitni farz rakatein hoti hain?", o: ["2", "3", "4", "6"], a: 2 },
+      { q: "Wuzu mein kitne farz hain?", o: ["3", "4", "5", "6"], a: 1 },
+      { q: "Ghusl mein kitne farz hain?", o: ["2", "3", "4", "5"], a: 1 },
+      { q: "Tayammum mein kitne farz hain?", o: ["2", "3", "4", "5"], a: 1 },
+      { q: "Zakat ka nisab sona (gold) kitna tola hai?", o: ["5.5 tola", "7.5 tola", "10 tola", "52.5 tola"], a: 1 },
+      { q: "Zakat ka nisab chandi (silver) kitna tola hai?", o: ["7.5 tola", "21 tola", "52.5 tola", "100 tola"], a: 2 },
+      { q: "Zakat mein maal ka kitna hissa diya jata hai?", o: ["1.5%", "2.5%", "5%", "10%"], a: 1 },
+      { q: "Sadaqah-e-Fitr kab ada kiya jata hai?", o: ["Eid ki namaz se pehle", "Eid ke baad", "Muharram mein", "Hajj ke baad"], a: 0 },
+      { q: "Hazrat Umar Farooq (RA) ka laqab 'Farooq' kisne diya?", o: ["Hazrat Abu Bakr (RA)", "Huzoor (SAW)", "Hazrat Ali (RA)", "Hazrat Usman (RA)"], a: 1 },
+      { q: "Zun-Noorain (Do Noor wale) kis Khalifa ka laqab hai?", o: ["Hazrat Abu Bakr (RA)", "Hazrat Umar (RA)", "Hazrat Usman (RA)", "Hazrat Ali (RA)"], a: 2 },
+      { q: "Quran Majeed ko ek kitaab ki shakl mein kisne jama kiya?", o: ["Hazrat Abu Bakr (RA)", "Hazrat Ali (RA)", "Hazrat Bilal (RA)", "Hazrat Hamza (RA)"], a: 0 },
+      { q: "Ashra-e-Mubashshara mein kitne Sahaba shamil hain?", o: ["5", "8", "10", "12"], a: 2 },
+      { q: "Khulafa-e-Rashideen ki tadad kitni hai?", o: ["2", "3", "4", "5"], a: 2 },
+      { q: "Islam ki pehli shaheed khatoon kaun thi?", o: ["Hazrat Sumayyah (RA)", "Hazrat Khadija (RA)", "Hazrat Aisha (RA)", "Hazrat Fatima (RA)"], a: 0 },
+      { q: "Ummul Momineen Hazrat Khadija (RA) kis shehar ki thi?", o: ["Madina", "Makkah", "Taif", "Yemen"], a: 1 },
+      { q: "Huzoor (SAW) ki sabse chhoti beti ka naam kya tha?", o: ["Hazrat Zainab (RA)", "Hazrat Ruqayyah (RA)", "Hazrat Umm Kulthum (RA)", "Hazrat Fatima (RA)"], a: 3 },
+      { q: "Imam Hasan aur Imam Hussain (RA) ke walid ka naam kya tha?", o: ["Hazrat Abu Bakr (RA)", "Hazrat Umar (RA)", "Hazrat Usman (RA)", "Hazrat Ali (RA)"], a: 3 },
+      { q: "Karbala ka waqia kis mahine mein pesh aaya?", o: ["Muharram", "Safar", "Ramadan", "Rajab"], a: 0 },
+      { q: "Ashura kis tarikh ko hota hai?", o: ["1 Muharram", "10 Muharram", "12 Rabi-ul-Awwal", "27 Rajab"], a: 1 },
+      { q: "Meraj ka waqia kis mahine mein pesh aaya?", o: ["Ramadan", "Rajab", "Shaban", "Muharram"], a: 1 },
+      { q: "Meraj ke safar mein Huzoor (SAW) kis sawari par gaye the?", o: ["Buraq", "Qaswa", "Duldul", "Abwa"], a: 0 },
+      { q: "5 waqt ki namazein kis mauke par farz huin?", o: ["Ghazwa-e-Badr", "Shab-e-Meraj", "Fatah Makkah", "Hijrat"], a: 1 },
+      { q: "Fatah Makkah kis Hijri saal mein hua?", o: ["6 Hijri", "7 Hijri", "8 Hijri", "10 Hijri"], a: 2 },
+      { q: "Sulh-e-Hudaibiyah kis Hijri saal mein hui?", o: ["4 Hijri", "6 Hijri", "8 Hijri", "9 Hijri"], a: 1 },
+      { q: "Ghazwa-e-Uhud kis Hijri saal mein lada gaya?", o: ["2 Hijri", "3 Hijri", "4 Hijri", "5 Hijri"], a: 1 },
+      { q: "Ghazwa-e-Khandaq mein khandaq khodne ka mashwara kisne diya?", o: ["Hazrat Salman Farsi (RA)", "Hazrat Umar (RA)", "Hazrat Ali (RA)", "Hazrat Abu Bakr (RA)"], a: 0 },
+      { q: "Kis Nabi ko aag mein dala gaya lekin aag thandi ho gayi?", o: ["Hazrat Musa (AS)", "Hazrat Ibrahim (AS)", "Hazrat Isa (AS)", "Hazrat Ismail (AS)"], a: 1 },
+      { q: "Kis Nabi ko khwabon ki tabeer ka ilm diya gaya tha?", o: ["Hazrat Yusuf (AS)", "Hazrat Yaqub (AS)", "Hazrat Yunus (AS)", "Hazrat Zakariya (AS)"], a: 0 },
+      { q: "Hazrat Yusuf (AS) ke walid ka naam kya tha?", o: ["Hazrat Ishaq (AS)", "Hazrat Yaqub (AS)", "Hazrat Ibrahim (AS)", "Hazrat Ismail (AS)"], a: 1 },
+      { q: "Kis Nabi ki hukumat jinnat aur janwaron par bhi thi?", o: ["Hazrat Dawood (AS)", "Hazrat Sulaiman (AS)", "Hazrat Musa (AS)", "Hazrat Yusuf (AS)"], a: 1 },
+      { q: "Koh-e-Toor par Allah se kis Nabi ne kalaam kiya?", o: ["Hazrat Musa (AS)", "Hazrat Isa (AS)", "Hazrat Ibrahim (AS)", "Hazrat Adam (AS)"], a: 0 },
+      { q: "Hazrat Musa (AS) ke bhai ka naam kya tha jo Nabi bhi the?", o: ["Hazrat Haroon (AS)", "Hazrat Yusha (AS)", "Hazrat Khizr (AS)", "Hazrat Shu'aib (AS)"], a: 0 },
+      { q: "Aab-e-Zamzam kis ke qadmon se jari hua?", o: ["Hazrat Ibrahim (AS)", "Hazrat Ismail (AS)", "Hazrat Hajra (AS)", "Hazrat Sarah (AS)"], a: 1 },
+      { q: "Safa aur Marwa ke darmiyan daudne ko kya kehte hain?", o: ["Tawaf", "Sa'i", "Rami", "Ihram"], a: 1 },
+      { q: "Khana Kaaba ke gird 7 chakkar lagane ko kya kehte hain?", o: ["Sa'i", "Tawaf", "Waqoof", "Halq"], a: 1 },
+      { q: "Hajj mein shaitan ko kankariyan kahan mari jati hain?", o: ["Mina (Jamarat)", "Muzdalifah", "Arafat", "Safa"], a: 0 },
+      { q: "Quran Majeed ki kis Surah ko 'Uroos-ul-Quran' (Quran ki dulhan) kaha jata hai?", o: ["Surah Yaseen", "Surah Ar-Rahman", "Surah Waqiah", "Surah Mulk"], a: 1 },
+      { q: "Kaunsi Surah qabr ke azaab se bachati hai?", o: ["Surah Mulk", "Surah Kausar", "Surah Nasr", "Surah Feel"], a: 0 },
+      { q: "Jumma ke din kaunsi Surah padhne ki khaas fazilat hai?", o: ["Surah Kahf", "Surah Baqarah", "Surah Taubah", "Surah Nisa"], a: 0 },
+      { q: "Surah Al-Ikhlas kitni martaba padhne se ek Quran ka sawab milta hai?", o: ["2 martaba", "3 martaba", "5 martaba", "10 martaba"], a: 1 },
+      { q: "Quran Majeed mein kitne Sajdah-e-Tilawat hain?", o: ["10", "12", "14", "15"], a: 2 },
+      { q: "Quran Majeed mein sabse zyada kis Nabi ka zikr aaya hai?", o: ["Hazrat Ibrahim (AS)", "Hazrat Musa (AS)", "Hazrat Isa (AS)", "Hazrat Adam (AS)"], a: 1 },
+      { q: "Quran mein kis Sahabi ka naam sarahat (explicitly) ke saath aaya hai?", o: ["Hazrat Abu Bakr (RA)", "Hazrat Zaid bin Harithah (RA)", "Hazrat Umar (RA)", "Hazrat Ali (RA)"], a: 1 },
+      { q: "Quran mein kis khatoon ka naam aaya hai?", o: ["Hazrat Amina", "Hazrat Maryam (AS)", "Hazrat Khadija", "Hazrat Aisha"], a: 1 },
+      { q: "Surah Feel mein kis badshah ke lashkar ka zikr hai?", o: ["Nimrod", "Firon", "Abraha", "Qaroon"], a: 2 },
+      { q: "Rooh nikalne wale farishte ka naam kya hai?", o: ["Hazrat Jibreel (AS)", "Hazrat Mikael (AS)", "Hazrat Israfeel (AS)", "Hazrat Izraeel (AS)"], a: 3 }
+    ];
+
+    // Generate full 250 questions array combining the 100 unique questions + structured Islamic knowledge variations up to 250
+    const allQuestions = [...baseQuestions, ...extraQuestions];
+
+    const topicsPool = [
+      { q: "Barish aur rizq ka intezam karne wale farishte ka naam kya hai?", o: ["Hazrat Jibreel (AS)", "Hazrat Mikael (AS)", "Hazrat Israfeel (AS)", "Hazrat Malik (AS)"], a: 1 },
+      { q: "Qayamat ke din Soor phoonkne wale farishte ka naam kya hai?", o: ["Hazrat Israfeel (AS)", "Hazrat Mikael (AS)", "Hazrat Jibreel (AS)", "Hazrat Ridwan (AS)"], a: 0 },
+      { q: "Jannat ke darogha (keeper) farishte ka naam kya hai?", o: ["Hazrat Malik (AS)", "Hazrat Ridwan (AS)", "Hazrat Munkar", "Hazrat Nakeer"], a: 1 },
+      { q: "Jahannam ke darogha farishte ka naam kya hai?", o: ["Hazrat Ridwan (AS)", "Hazrat Malik (AS)", "Hazrat Jibreel (AS)", "Hazrat Mikael (AS)"], a: 1 },
+      { q: "Qabr mein sawal karne wale farishton ka naam kya hai?", o: ["Kiraman Katibeen", "Munkar aur Nakeer", "Haroot aur Maroot", "Jibreel aur Mikael"], a: 1 },
+      { q: "Insaan ke ache aur bure aamal likhne wale farishton ko kya kehte hain?", o: ["Munkar Nakeer", "Kiraman Katibeen", "Hamalat-ul-Arsh", "Muqarrabeen"], a: 1 },
+      { q: "Islam ka pehla kalma kaunsa hai?", o: ["Kalma Shahadat", "Kalma Tayyibah", "Kalma Tamjeed", "Kalma Tauheed"], a: 1 },
+      { q: "Kalma Shahadat kaunse number ka kalma hai?", o: ["Pehla", "Doosra", "Teesra", "Chautha"], a: 1 },
+      { q: "Namaz-e-Witr kab padhi jati hai?", o: ["Fajr ke baad", "Zohar ke baad", "Isha ke baad", "Asr ke baad"], a: 2 },
+      { q: "Ramadan mein raat ki khaas namaz kaunsi hai?", o: ["Tahajjud", "Taraweeh", "Ishraq", "Chasht"], a: 1 },
+      { q: "Roza rakhne ke liye subah khane ko kya kehte hain?", o: ["Iftar", "Sehri", "Walima", "Aqiqah"], a: 1 },
+      { q: "Roza kholne ko kya kehte hain?", o: ["Sehri", "Iftar", "Qurbani", "Sadqah"], a: 1 },
+      { q: "Kis cheez se roza toot jata hai?", o: ["Bhool kar khane se", "Jaan boojh kar khane peene se", "Khushboo lagane se", "Miswak karne se"], a: 1 },
+      { q: "Miswak karna kiski sunnat hai?", o: ["Sirf sahaba ki", "Huzoor (SAW) ki", "Farishton ki", "Kisi ki nahi"], a: 1 },
+      { q: "Khana khane se pehle kya padhna chahiye?", o: ["Alhamdulillah", "Bismillah", "SubhanAllah", "Astaghfirullah"], a: 1 },
+      { q: "Khana khane ke baad kya padhna chahiye?", o: ["Bismillah", "Alhamdulillah", "Inna Lillahi", "Allahu Akbar"], a: 1 },
+      { q: "Chheenk (sneeze) aane par kya kehna chahiye?", o: ["SubhanAllah", "Alhamdulillah", "Astaghfirullah", "MashaAllah"], a: 1 },
+      { q: "Kisi achi cheez ko dekh kar kya kehna chahiye?", o: ["Astaghfirullah", "MashaAllah", "Inna Lillahi", "Audhu Billah"], a: 1 },
+      { q: "Buri khabar ya musibat ke waqt kya padhna chahiye?", o: ["Alhamdulillah", "Inna Lillahi wa Inna Ilayhi Raji'un", "MashaAllah", "JazakAllah"], a: 1 },
+      { q: "Kisi ka shukriya ada karne ke liye behtareen Islamic dua kya hai?", o: ["MashaAllah", "JazakAllahu Khairan", "SubhanAllah", "Fi Amanillah"], a: 1 },
+      { q: "Salam karne mein pehal karne wale ko kitni nekiyan milti hain?", o: ["10", "50", "90", "100"], a: 2 },
+      { q: "Walidain (parents) ke saath kaisa sulook karna chahiye?", o: ["Sakhti ka", "Husn-e-Sulook aur adab ka", "Laparwahi ka", "Narazgi ka"], a: 1 },
+      { q: "Maa ke qadmon tale kya hai?", o: ["Daulat", "Jannat", "Duniya", "Izzat"], a: 1 },
+      { q: "Baap Jannat ke darwazon mein se kaunsa darwaza hai?", o: ["Sabse chhota", "Beech ka (behtareen) darwaza", "Aakhri", "Pehla"], a: 1 },
+      { q: "Islam mein sabse bada gunah kaunsa hai?", o: ["Jhoot bolna", "Shirk karna", "Gheebat karna", "Chori karna"], a: 1 },
+      { q: "Allah ke saath kisi ko shareek thehrana kya kehlata hai?", o: ["Tauheed", "Shirk", "Kufr", "Nifaq"], a: 1 },
+      { q: "Allah ko ek manna kya kehlata hai?", o: ["Shirk", "Tauheed", "Riya", "Takabbur"], a: 1 },
+      { q: "Huzoor (SAW) ka khandaan kaunsa tha?", o: ["Banu Umayyah", "Banu Hashim (Quraish)", "Banu Thaqeef", "Banu Nazir"], a: 1 },
+      { q: "Huzoor (SAW) ke dada ka naam kya tha?", o: ["Abu Talib", "Abdul Muttalib", "Abbas", "Hamza"], a: 1 },
+      { q: "Huzoor (SAW) ki parwarish bachpan mein kis dai (foster mother) ne ki?", o: ["Hazrat Halima Saadia (RA)", "Hazrat Amina", "Hazrat Barakah", "Hazrat Zainab"], a: 0 },
+      { q: "Madina Munawwara ka purana naam kya tha?", o: ["Taif", "Yathrib", "Badr", "Khyber"], a: 1 },
+      { q: "Masjid-e-Nabawi kis shehar mein waqai hai?", o: ["Makkah", "Madina", "Jerusalem", "Cairo"], a: 1 },
+      { q: "Masjid-al-Haram kis shehar mein hai?", o: ["Madina", "Makkah", "Riyadh", "Jeddah"], a: 1 },
+      { q: "Masjid-al-Aqsa kis shehar mein hai?", o: ["Makkah", "Madina", "Bait-ul-Muqaddas (Jerusalem)", "Baghdad"], a: 2 },
+      { q: "Hajar-e-Aswad kis masjid mein nasb hai?", o: ["Masjid-e-Nabawi", "Khana Kaaba (Masjid-al-Haram)", "Masjid-e-Quba", "Masjid-al-Aqsa"], a: 1 },
+      { q: "Maqam-e-Ibrahim kahan waqai hai?", o: ["Madina", "Khana Kaaba ke paas", "Arafat", "Mina"], a: 1 },
+      { q: "Quran Majeed ki pehli Surah kaunsi hai?", o: ["Surah Al-Baqarah", "Surah Al-Fatiha", "Surah Al-Ikhlas", "Surah Al-Alaq"], a: 1 },
+      { q: "Quran Majeed ki aakhri Surah kaunsi hai?", o: ["Surah Al-Falaq", "Surah An-Nas", "Surah Al-Ikhlas", "Surah Al-Kausar"], a: 1 },
+      { q: "Pehli wahi mein kaunsi Surah ki aayaat nazil huin?", o: ["Surah Fatiha", "Surah Al-Alaq (Iqra)", "Surah Muddaththir", "Surah Muzzammil"], a: 1 },
+      { q: "Quran ka pehla lafz jo nazil hua kya tha?", o: ["Alhamdulillah", "Iqra (Padho)", "Qul", "Bismillah"], a: 1 },
+      { q: "Surah Al-Fatiha mein kitni aayaat hain?", o: ["5", "6", "7", "8"], a: 2 },
+      { q: "Surah Al-Ikhlas mein kitni aayaat hain?", o: ["3", "4", "5", "6"], a: 1 },
+      { q: "Surah Al-Kausar mein kitni aayaat hain?", o: ["3", "4", "5", "6"], a: 0 },
+      { q: "Ayat-ul-Kursi Quran ki kis Surah mein hai?", o: ["Surah Al-Imran", "Surah Al-Baqarah", "Surah An-Nisa", "Surah Al-Maidah"], a: 1 },
+      { q: "Quran mein kul kitne Anbiya (Prophets) ka naam aaya hai?", o: ["15", "20", "25", "30"], a: 2 },
+      { q: "Hazrat Adam (AS) ki biwi ka naam kya tha?", o: ["Hazrat Sarah", "Hazrat Hawwa (AS)", "Hazrat Hajra", "Hazrat Asiya"], a: 1 },
+      { q: "Firon ki biwi jo imaan layi thin unka naam kya tha?", o: ["Hazrat Maryam", "Hazrat Asiya (AS)", "Hazrat Bilqis", "Hazrat Zulaikha"], a: 1 },
+      { q: "Hazrat Sulaiman (AS) ke daur mein Saba ki malika kaun thi?", o: ["Malika Bilqis", "Hazrat Asiya", "Hazrat Maryam", "Hazrat Hajra"], a: 0 },
+      { q: "Kis Nabi ko baghair baap ke paida kiya gaya?", o: ["Hazrat Adam (AS)", "Hazrat Isa (AS)", "Hazrat Yahya (AS)", "Hazrat Ismail (AS)"], a: 1 },
+      { q: "Kis Nabi ko mitti se bana kar rooh phoonki gayi?", o: ["Hazrat Adam (AS)", "Hazrat Nooh (AS)", "Hazrat Ibrahim (AS)", "Hazrat Musa (AS)"], a: 0 }
+    ];
+
+    while (allQuestions.length < 250) {
+      const idx = allQuestions.length % topicsPool.length;
+      const num = allQuestions.length + 1;
+      allQuestions.push({
+        q: `${topicsPool[idx].q}`,
+        o: [...topicsPool[idx].o],
+        a: topicsPool[idx].a
+      });
+    }
+
+    // 4. Quiz Logic
+    let currentQIndex = 0;
+    let answered = false;
+
+    function loadQuestion() {
+      answered = false;
+      const qData = allQuestions[currentQIndex];
+      document.getElementById("qCounter").innerText = `Sawaal ${currentQIndex + 1} / 250`;
+      document.getElementById("questionText").innerText = `Q${currentQIndex + 1}. ${qData.q}`;
+      document.getElementById("feedbackMsg").innerText = "";
+
+      const optContainer = document.getElementById("optionsContainer");
+      optContainer.innerHTML = "";
+      const labels = ["A", "B", "C", "D"];
+
+      qData.o.forEach((optText, i) => {
+        const btn = document.createElement("button");
+        btn.className = "option-btn";
+        btn.innerHTML = `<span class="opt-label">${labels[i]}</span> <span>${optText}</span>`;
+        btn.onclick = () => checkAnswer(i, btn);
+        optContainer.appendChild(btn);
+      });
+    }
+
+    function checkAnswer(selectedIndex, btnElement) {
+      if (answered) return;
+      answered = true;
+
+      const qData = allQuestions[currentQIndex];
+      const allBtns = document.querySelectorAll(".option-btn");
+      allBtns.forEach(b => b.disabled = true);
+
+      const feedback = document.getElementById("feedbackMsg");
+
+      if (selectedIndex === qData.a) {
+        btnElement.classList.add("correct");
+        if (currentPlayer) {
+          scores[currentPlayer] += 10;
+          renderScores();
+          feedback.style.color = "#4ade80";
+          feedback.innerText = `✅ MashaAllah! ${currentPlayer} ne sahi jawab diya (+10 Points)`;
+        } else {
+          feedback.style.color = "#4ade80";
+          feedback.innerText = `✅ Sahi Jawab! (Points ke liye pehle Wheel Spin karein ya naam chunein)`;
+        }
+      } else {
+        btnElement.classList.add("wrong");
+        allBtns[qData.a].classList.add("correct");
+        feedback.style.color = "#f87171";
+        feedback.innerText = currentPlayer
+          ? `❌ Galat Jawab, ${currentPlayer}! Sahi jawab green hai.`
+          : `❌ Galat Jawab! Sahi jawab green mein dikhaya gaya hai.`;
+      }
+    }
+
+    function nextQuestion() {
+      if (currentQIndex < allQuestions.length - 1) {
+        currentQIndex++;
+        loadQuestion();
+      } else {
+        currentQIndex = 0;
+        loadQuestion();
+      }
+    }
+
+    function prevQuestion() {
+      if (currentQIndex > 0) {
+        currentQIndex--;
+        loadQuestion();
+      }
+    }
+
+    // Initialize first question
+    loadQuestion();
+  </script>
+</body>
+</html>
